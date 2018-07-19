@@ -5,9 +5,10 @@ require('bootstrap/dist/css/bootstrap.min.css');
 //require('vue-style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css');
 //require('bootstrap');
 
-new Vue({
+let meuVue = new Vue({
   el: '#app',
   data: {
+    colunas: ['nome','pontos','gm','gs','saldo'],
     times:[
         new Time('Palmeiras', require('./assets/palmeiras_60x60.png')),
         new Time('Flamengo', require('./assets/flamengo_60x60.png')),
@@ -39,9 +40,29 @@ new Vue({
         time: null,
         gols:0
       }
-    }
+    },
+    view: 'tabela'    
   },
-  created() {
+  methods: {
+    fimdeJogo() {
+      let timeAdversario = this.novoJogo.fora.time;
+      let golsAdversario = +this.novoJogo.fora.gols;
+      let timeCasa = this.novoJogo.casa.time;
+      let golsCasa = +this.novoJogo.casa.gols;
+
+       if (golsCasa == golsAdversario){
+            timeCasa.updateInfo(1,golsCasa,golsAdversario);
+            timeAdversario.updateInfo(1,golsAdversario,golsCasa);
+        } else if (golsAdversario > golsCasa){
+            timeCasa.updateInfo(0,golsCasa,golsAdversario);
+            timeAdversario.updateInfo(3,golsAdversario,golsCasa);
+        }else{
+            timeCasa.updateInfo(3,golsCasa,golsAdversario);
+            timeAdversario.updateInfo(0,golsAdversario,golsCasa);
+        }
+        this.showView('tabela')
+    },
+    createNovoJogo(){
       let indexCasa = Math.floor(Math.random() * 20),
           indexFora = Math.floor(Math.random() * 20);
 
@@ -49,5 +70,18 @@ new Vue({
       this.novoJogo.casa.gols = 0;
       this.novoJogo.fora.time = this.times[indexFora];
       this.novoJogo.fora.gols = 0;
+      this.showView('novojogo')
+    },
+    showView(view){
+      this.view = view;
+    }
+  },
+  filters: {
+    saldo(time){
+       return time.gm - time.gs;
+    },
+    ucwords(value){
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
   }
 })

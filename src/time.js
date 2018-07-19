@@ -7,4 +7,10 @@ export class Time {
         this.gm = 0;
         this.gs = 0;
     }
+
+    updateInfo(pontos,golsMarcados,golsSofridos){
+        this.pontos += pontos;
+        this.gm += golsMarcados;
+        this.gs += golsSofridos;
+    }
 }
