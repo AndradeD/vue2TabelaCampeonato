@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import {Time} from './time';
+import lodash from 'lodash';
 
 require('bootstrap/dist/css/bootstrap.min.css');
 //require('vue-style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css');
@@ -8,6 +9,11 @@ require('bootstrap/dist/css/bootstrap.min.css');
 let meuVue = new Vue({
   el: '#app',
   data: {
+    order: {
+      keys: ['pontos','gm','gs'],
+      sort: [ 'desc', 'desc', 'asc']
+    },
+    filter: '',
     colunas: ['nome','pontos','gm','gs','saldo'],
     times:[
         new Time('Palmeiras', require('./assets/palmeiras_60x60.png')),
@@ -66,6 +72,10 @@ let meuVue = new Vue({
       let indexCasa = Math.floor(Math.random() * 20),
           indexFora = Math.floor(Math.random() * 20);
 
+      while (indexCasa == indexFora){
+        indexFora = Math.floor(Math.random() * 20);
+      }
+
       this.novoJogo.casa.time = this.times[indexCasa];
       this.novoJogo.casa.gols = 0;
       this.novoJogo.fora.time = this.times[indexFora];
@@ -74,6 +84,25 @@ let meuVue = new Vue({
     },
     showView(view){
       this.view = view;
+    },
+    sortBy(coluna){
+      this.order.keys = coluna;
+      if (this.order.sort == 'desc'){
+        this.order.sort = 'asc';  
+      }else{
+        this.order.sort = 'desc';
+      }      
+    }
+  },
+  computed: {
+    timesFiltered(){
+        let colecao = lodash.orderBy(this.times, this.order.keys,this.order.sort);
+
+        return lodash.filter(colecao, item => {
+          if (item.nome.indexOf(this.filter) != -1){
+           return item.nome; 
+          }           
+        });
     }
   },
   filters: {
